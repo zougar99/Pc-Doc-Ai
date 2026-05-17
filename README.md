@@ -48,9 +48,30 @@
 Python 3.8+
 ```
 
-### Install Dependencies
+### Option 1: Quick Install (Recommended)
 ```bash
+# Just run the app - it will work!
+python main.py --quick
+```
+
+### Option 2: With Virtual Environment
+```bash
+# Create virtual environment
+python -m venv .venv
+
+# Activate (Windows)
+.venv\Scripts\activate
+
+# Activate (Linux/Mac)
+source .venv/bin/activate
+
+# Install dependencies
 pip install -r requirements.txt
+```
+
+### Option 3: Run Setup Script
+```bash
+python setup_venv.py
 ```
 
 ---
