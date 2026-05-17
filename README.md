@@ -5,8 +5,14 @@
 ![Python](https://img.shields.io/badge/Python-3.8+-blue)
 ![Windows](https://img.shields.io/badge/Windows-10%2F11-green)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
+![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue)
 
 **AI-Powered PC Diagnostic & System Optimization Tool** 🇩🇿
+| Supported Platforms | Status |
+|---------------------|--------|
+| Windows 10/11 | ✅ Full Support |
+| macOS | ✅ Basic Support |
+| Linux | ✅ Basic Support |
 
 *Comprehensive system analysis with intelligent AI diagnostics*
 

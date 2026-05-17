@@ -1,7 +1,7 @@
-<<<<<<< HEAD
 """
-PC System Scanners - Comprehensive hardware and software diagnostic modules.
+PC System Scanners - Cross-platform hardware and software diagnostic modules.
 Scans CPU, Memory, Disk, Network, GPU, Security, Processes, and Event Logs.
+Works on Windows, macOS, and Linux.
 """
 
 import psutil
@@ -11,23 +11,61 @@ import subprocess
 import os
 import sys
 import time
-import ctypes
-import winreg
 from datetime import datetime, timedelta
 from dataclasses import dataclass, field
 from typing import Optional
 
-try:
-    import wmi
-    WMI_AVAILABLE = True
-except ImportError:
-    WMI_AVAILABLE = False
+IS_WINDOWS = platform.system() == "Windows"
+IS_MAC = platform.system() == "Darwin"
+IS_LINUX = platform.system() == "Linux"
 
-try:
-    import GPUtil
-    GPUTIL_AVAILABLE = True
-except ImportError:
-    GPUTIL_AVAILABLE = False
+WMI_AVAILABLE = False
+GPUTIL_AVAILABLE = False
+
+if IS_WINDOWS:
+    try:
+        import wmi
+        WMI_AVAILABLE = True
+    except ImportError:
+        pass
+
+    try:
+        import GPUtil
+        GPUTIL_AVAILABLE = True
+    except ImportError:
+        pass
+
+    try:
+        import winreg
+    except ImportError:
+        pass
+
+if IS_MAC or IS_LINUX:
+    try:
+        import GPUtil
+        GPUTIL_AVAILABLE = True
+    except ImportError:
+        pass
+
+
+def is_admin() -> bool:
+    """Check if running with admin/root privileges"""
+    try:
+        if IS_WINDOWS:
+            import ctypes
+            return ctypes.windll.shell32.IsUserAnAdmin() != 0
+        else:
+            return os.geteuid() == 0
+    except:
+        return False
+
+
+def run_cmd(cmd: list) -> subprocess.CompletedProcess:
+    """Run command cross-platform"""
+    try:
+        return subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+    except:
+        return subprocess.CompletedProcess(cmd, 1, "", "Error")
 
 
 # ─── Data Models ────────────────────────────────────────────────────────────────
@@ -3190,25 +3228,11 @@ class MasterScanner:
         final = avg * 0.6 + worst_score * 0.4
         return max(0, min(100, final))
 
-    def get_all_issues(self, results: dict) -> list:
+def get_all_issues(self, results: dict) -> list:
         issues = []
         for r in results.values():
             issues.extend(r.issues)
         return issues
-=======
-"""
-PC System Scanners - Comprehensive hardware and software diagnostic modules.
-Scans CPU, Memory, Disk, Network, GPU, Security, Processes, and Event Logs.
-"""
-
-import psutil
-import platform
-import socket
-import subprocess
-import os
-import sys
-import time
-import ctypes
 import winreg
 from datetime import datetime, timedelta
 from dataclasses import dataclass, field
@@ -3828,10 +3852,11 @@ class SecurityScanner:
 
             result.data = {
                 "firewall_enabled": firewall,
-                "windows_defender": defender,
-                "uac_enabled": uac,
-                "pending_updates": updates,
-                "is_admin": ctypes.windll.shell32.IsUserAnAdmin() != 0,
+                "windows_defender": defender if IS_WINDOWS else {"enabled": True, "note": "Non-Windows system"},
+                "uac_enabled": uac if IS_WINDOWS else True,
+                "pending_updates": updates if IS_WINDOWS else None,
+                "is_admin": is_admin(),
+                "platform": platform.system(),
             }
 
             if not firewall:
@@ -6392,4 +6417,3 @@ class MasterScanner:
         for r in results.values():
             issues.extend(r.issues)
         return issues
->>>>>>> d4976186ee1858695101339c4be95621452f871e
